@@ -59,6 +59,8 @@ class Ability
   def user_dependent_permissions
     can(:show, Welcome)
     can(%i[show update], User, id: user.id)
+    can(%i[index read show view search], Response, mission_id: mission.id)
+    can(%i[index read show view search], UserGroup, mission_id: mission.id)
     can(:confirm_login, UserSession)
     can(:manage, Operation, creator_id: user.id)
     can(:submit_to, Form) { |f| user.admin? || user.assignments.detect { |a| a.mission == f.mission } }
