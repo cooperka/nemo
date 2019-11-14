@@ -3,36 +3,39 @@
 #
 # Table name: forms
 #
-#  id                    :uuid             not null, primary key
-#  access_level          :string(255)      default("private"), not null
-#  allow_incomplete      :boolean          default(FALSE), not null
-#  authenticate_sms      :boolean          default(TRUE), not null
-#  default_response_name :string
-#  downloads             :integer
-#  name                  :string(255)      not null
-#  sms_relay             :boolean          default(FALSE), not null
-#  smsable               :boolean          default(FALSE), not null
-#  standard_copy         :boolean          default(FALSE), not null
-#  status                :string           default("draft"), not null
-#  status_changed_at     :datetime
-#  upgrade_needed        :boolean          default(FALSE), not null
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
-#  current_version_id    :uuid
-#  mission_id            :uuid
-#  original_id           :uuid
-#  root_id               :uuid
+#  id                         :uuid             not null, primary key
+#  access_level               :string(255)      default("private"), not null
+#  allow_incomplete           :boolean          default(FALSE), not null
+#  authenticate_sms           :boolean          default(TRUE), not null
+#  default_response_name      :string
+#  downloads                  :integer
+#  name                       :string(255)      not null
+#  sms_relay                  :boolean          default(FALSE), not null
+#  smsable                    :boolean          default(FALSE), not null
+#  standard_copy              :boolean          default(FALSE), not null
+#  status                     :string           default("draft"), not null
+#  status_changed_at          :datetime
+#  upgrade_needed             :boolean          default(FALSE), not null
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  current_version_id         :uuid
+#  mission_id                 :uuid
+#  oldest_version_accepted_id :uuid
+#  original_id                :uuid
+#  root_id                    :uuid
 #
 # Indexes
 #
-#  index_forms_on_current_version_id  (current_version_id)
-#  index_forms_on_mission_id          (mission_id)
-#  index_forms_on_original_id         (original_id)
-#  index_forms_on_root_id             (root_id) UNIQUE
-#  index_forms_on_status              (status)
+#  index_forms_on_current_version_id          (current_version_id)
+#  index_forms_on_mission_id                  (mission_id)
+#  index_forms_on_oldest_version_accepted_id  (oldest_version_accepted_id)
+#  index_forms_on_original_id                 (original_id)
+#  index_forms_on_root_id                     (root_id) UNIQUE
+#  index_forms_on_status                      (status)
 #
 # Foreign Keys
 #
+#  fk_rails_...                   (oldest_version_accepted_id => form_versions.id)
 #  forms_current_version_id_fkey  (current_version_id => form_versions.id) ON DELETE => nullify ON UPDATE => restrict
 #  forms_mission_id_fkey          (mission_id => missions.id) ON DELETE => restrict ON UPDATE => restrict
 #  forms_original_id_fkey         (original_id => forms.id) ON DELETE => nullify ON UPDATE => restrict
