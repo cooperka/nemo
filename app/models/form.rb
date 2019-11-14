@@ -162,6 +162,17 @@ class Form < ApplicationRecord
     current_version.try(:code) || ""
   end
 
+  def oldest_version_accepted_name
+    FormVersion.find(oldest_version_accepted_id).name
+  end
+
+  # Return all possible versions formatted for a select dropdown.
+  def possible_versions
+    versions.order(created_at: :desc).reverse.map do |version|
+      [version.name, version.id]
+    end
+  end
+
   def any_questions?
     questionings.any?
   end

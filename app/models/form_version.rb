@@ -47,6 +47,11 @@ class FormVersion < ApplicationRecord
     self.class.create!(form_id: form_id, is_current: true)
   end
 
+  # Version name for displaying to user
+  def name
+    "#{number}, #{code}"
+  end
+
   private
 
   # Code is a series of random letters

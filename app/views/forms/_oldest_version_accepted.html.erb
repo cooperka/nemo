@@ -1,0 +1,5 @@
+<% if read_only %>
+  <%= form.object.oldest_version_accepted_name %>
+<% else %>
+  <%= form.select(:oldest_version_accepted_id, form.object.possible_versions, {}, class: "form-control") %>
+<% end %>
