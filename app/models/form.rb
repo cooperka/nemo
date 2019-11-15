@@ -273,11 +273,17 @@ class Form < ApplicationRecord
   def upgrade_version!
     raise "standard forms should not be versioned" if standard?
 
+    # If the user has changed this manually, don't bump it on version upgrade.
+    bump_oldest_version_accepted = oldest_version_accepted_id.blank? ||
+      oldest_version_accepted_id == current_version.id
+
     if current_version
       current_version.upgrade!
     else
       FormVersion.create(form_id: id, is_current: true)
     end
+
+    self.oldest_version_accepted_id = current_version.id if bump_oldest_version_accepted
 
     # since we've upgraded, we can lower the upgrade flag
     self.upgrade_needed = false
