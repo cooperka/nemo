@@ -64,6 +64,7 @@ class Form < ApplicationRecord
                                              dependent: :destroy
   has_many :whitelistings, as: :whitelistable, class_name: "Whitelisting", dependent: :destroy
   has_many :standard_form_reports, class_name: "Report::StandardFormReport", dependent: :destroy
+  has_one :oldest_version_accepted, class_name: "FormVersion", dependent: :destroy
 
   # For some reason dependent: :destroy doesn't work with this assoc. See destroy_items for workaround.
   belongs_to :root_group, autosave: true, class_name: "QingGroup", foreign_key: :root_id
@@ -160,10 +161,6 @@ class Form < ApplicationRecord
 
   def version
     current_version.try(:code) || ""
-  end
-
-  def oldest_version_accepted_name
-    FormVersion.find(oldest_version_accepted_id).name
   end
 
   # Return all possible versions formatted for a select dropdown.
@@ -285,8 +282,8 @@ class Form < ApplicationRecord
     raise "standard forms should not be versioned" if standard?
 
     # If the user has changed this manually, don't bump it on version upgrade.
-    bump_oldest_version_accepted = oldest_version_accepted_id.blank? ||
-      oldest_version_accepted_id == current_version.id
+    bump_oldest_version_accepted = oldest_version_accepted.nil? ||
+      oldest_version_accepted == current_version
 
     if current_version
       current_version.upgrade!
@@ -294,7 +291,7 @@ class Form < ApplicationRecord
       FormVersion.create(form_id: id, is_current: true)
     end
 
-    self.oldest_version_accepted_id = current_version.id if bump_oldest_version_accepted
+    self.oldest_version_accepted = current_version if bump_oldest_version_accepted
 
     # since we've upgraded, we can lower the upgrade flag
     self.upgrade_needed = false

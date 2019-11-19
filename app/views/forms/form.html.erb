@@ -38,7 +38,7 @@
         <%= f.field(:access_level, partial: "form_access_level") %>
         <%= f.field(:allow_incomplete, type: :check_box, read_only: form.published?) %>
         <%= f.field(:smsable, type: :check_box)  %>
-        <%= f.field(:oldest_version_accepted, partial: "oldest_version_accepted") if form.oldest_version_accepted_id? %>
+        <%= f.field(:oldest_version_accepted, partial: "oldest_version_accepted") unless form.oldest_version_accepted.nil? %>
         <div class="sms-fields">
           <%= f.field(:sms_relay, type: :check_box) %>
           <%= f.field(:recipient_ids, type: :select, multiple: true, prompt: false,

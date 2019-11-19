@@ -193,30 +193,30 @@ describe Form do
 
   context "oldest version accepted" do
     it "should set on first publish" do
-      expect(form.oldest_version_accepted_id).to be(nil)
+      expect(form.oldest_version_accepted).to be(nil)
       form.update_status(:live)
-      expect(form.oldest_version_accepted_id).to match(form.current_version.id)
+      expect(form.oldest_version_accepted).to eq(form.current_version)
     end
 
     context "should bump on upgrade" do
       it "by default" do
         form.update_status(:live)
-        id1 = form.oldest_version_accepted_id
-        expect(id1).to match(form.current_version.id)
+        v1 = form.oldest_version_accepted
+        expect(v1).to eq(form.current_version)
         form.upgrade_version!
-        id2 = form.oldest_version_accepted_id
-        expect(id2).to match(form.current_version.id)
-        expect(id2).to_not(match(id1))
+        v2 = form.oldest_version_accepted
+        expect(v2).to eq(form.current_version)
+        expect(v2).not_to eq(v1)
       end
 
       it "unless user set manually" do
         form.update_status(:live)
-        id1 = form.oldest_version_accepted_id
+        v1 = form.oldest_version_accepted
         form.upgrade_version!
-        form.oldest_version_accepted_id = id1
+        form.oldest_version_accepted = v1
         form.upgrade_version!
-        id3 = form.oldest_version_accepted_id
-        expect(id3).to match(id1)
+        v3 = form.oldest_version_accepted
+        expect(v3).to be(v1)
       end
     end
   end
