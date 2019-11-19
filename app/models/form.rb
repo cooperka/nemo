@@ -165,10 +165,14 @@ class Form < ApplicationRecord
 
   # Return all possible versions formatted for a select dropdown.
   def possible_versions
-    versions.order(created_at: :desc).reverse.map do |version|
+    versions.order(created_at: :desc).map do |version|
+      # TODO: try without this
       [version.name, version.id]
     end
   end
+
+  # Getter for oldest accepted version id
+  # Setter that changes those flags
 
   def any_questions?
     questionings.any?
@@ -282,6 +286,8 @@ class Form < ApplicationRecord
     raise "standard forms should not be versioned" if standard?
 
     # If the user has changed this manually, don't bump it on version upgrade.
+    # TODO: Discuss at standup
+    # Add is_oldest flag (unique multicolumn index)
     bump_oldest_version_accepted = oldest_version_accepted.nil? ||
       oldest_version_accepted == current_version
 
