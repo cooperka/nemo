@@ -170,17 +170,6 @@ class Answer < ResponseNode
                      end
   end
 
-  # Raises a loud error if the OptionNode is not in the OptionSet (or the mission) for security purposes.
-  # Note: This would be simpler to put in choice.rb,
-  # but `answer` isn't defined at that point in time, so we can't scope it there.
-  def choices_attributes=(attributes)
-    attributes.each do |(_index, item)|
-      scope = OptionNode.where(option_set: option_set)
-      raise ArgumentError if scope.find_by(id: item["option_node_id"]).nil?
-    end
-    super(attributes)
-  end
-
   # If this is an answer to a multilevel select_one question, returns the OptionLevel, else returns nil.
   def level
     option_set.try(:multilevel?) ? option_set.levels[(rank || 1) - 1] : nil
