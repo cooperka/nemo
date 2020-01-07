@@ -85,6 +85,8 @@ describe OptionNode do
     end
   end
 
+  # TODO: This could be moved into ability spec? Instead of just deleting it
+  # Add option_node.removable ability to the policy and test it with this logic
   describe "removable?" do
     let(:form) { create(:form, question_types: %w[select_one]) }
     let(:node) { form.questions[0].option_set.children[0] }

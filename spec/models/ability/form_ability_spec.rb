@@ -7,6 +7,7 @@ describe "abilities for forms" do
 
   let(:object) { form }
   let(:all) do
+    # Note: These come from ability.rb, look at usages
     %i[add_questions change_status clone destroy download remove_questions reorder_questions show update]
   end
 

@@ -242,6 +242,8 @@ class OptionNode < ApplicationRecord
         # And option_has_answers? kicks off a big SQL query for a huge set.
         # Conditions association should be eager loaded.
         unless huge?
+          # This should consult the `destroy` permission for option_node in the authorization system,
+          # but it all needs to be refactored anyway; it's not worth doing more gross things just for this.
           branch[:removable] = !option_set.option_has_answers?(node.option_id) && node.conditions.empty?
         end
 
@@ -298,9 +300,13 @@ class OptionNode < ApplicationRecord
     total_options - (huge? ? TO_SERIALIZE_IF_HUGE : 0)
   end
 
-  def removable?
-    !data?
-  end
+  # Something you ask the policy, instead of defined here
+  # Or get rid of? :removable set above
+  #
+  # TODO: Run specs and see what happens
+  #def removable?
+  #  !data?
+  #end
 
   def to_s
     "Option Node: ID #{id}  Option ID: " +

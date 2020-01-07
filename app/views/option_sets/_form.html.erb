@@ -14,6 +14,8 @@
           required: true,
           read_only: cannot?(:update_core, @option_set) || @option_set.published?,
           prompt: false) %>
+    <!-- TODO: Consolidate change_geographic to be update_core and make sure it's in ability;
+    put it next to manage, add comment why it's redundant -->
     <%= f.field(:geographic, type: :check_box, read_only: cannot?(:change_geographic, @option_set)) %>
     <%= f.field(:allow_coordinates, type: :check_box, read_only: cannot?(:change_geographic, @option_set)) %>
     <%= f.field(:multilevel, type: :check_box,

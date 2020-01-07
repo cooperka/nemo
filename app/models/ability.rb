@@ -56,6 +56,8 @@ class Ability
   # - The routes file (are there any custom actions combined authorize_resource?-if so, consider using
   #   skip_authorize_resource and using a stock permission unless the custom one is really needed.)
 
+  # Because of this^ you may need to grep for optionset.can? etc. above
+
   def user_dependent_permissions
     can(:show, Welcome)
     can(%i[show update], User, id: user.id)
@@ -149,7 +151,7 @@ class Ability
       end
 
       [Form, OptionSet, OptionSets::Import, Questioning, FormItem, SkipRule,
-       QingGroup, Option, Tag, Tagging].each do |klass|
+       QingGroup, OptionNode, Option, Tag, Tagging].each do |klass|
         can(:manage, klass, mission_id: mission.id)
       end
       can(:condition_form, Constraint, mission_id: mission.id)
@@ -240,6 +242,8 @@ class Ability
     # we need these specialized permissions because option names/hints are updated via option set
     cannot(%i[add_options remove_options reorder_options], OptionSet, &:published?)
     cannot(:destroy, OptionSet) { |o| o.data? || o.in_use? || o.published? }
+    cannot(:destroy, OptionNode) { |o| 'TODO' }
+    # TODO: Add option node ability spec, test destroy (that's it), borrow logic from model spec noted elsewhere
 
     # operations can't be destroyed while their underlying job is in progress
     cannot :destroy, Operation do |op|
