@@ -42,6 +42,8 @@ class ElmoFormBuilder < ActionView::Helpers::FormBuilder
     wrapper_classes << "#{@object.class.model_name.param_key}_#{field_name}"
     wrapper_classes << "has-errors" if errors.present?
 
+    # TODO: Use something like elmo_field_hint() below to render inline-hint
+    #
     # get key chunks and render partial
     @template.render(partial: "layouts/elmo_form_field", locals: {
       field_name: field_name,
@@ -191,7 +193,7 @@ class ElmoFormBuilder < ActionView::Helpers::FormBuilder
         case options[:type]
         when :check_box
           tag_options.delete(:class) # Not sure if this is needed.
-          check_box(field_name, tag_options)
+          check_box(field_name, tag_options.merge(options[:checkbox_options] || {}))
 
         when :radio_buttons
           tag_options[:class] = "radio"
