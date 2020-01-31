@@ -1,0 +1,7 @@
+{
+  "routes": {
+    "/": "root.json",
+    "/$metadata": "metadata.xml",
+    "/responses": "responses.json"
+  }
+}
