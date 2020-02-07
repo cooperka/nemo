@@ -55,6 +55,9 @@
     if (!this.controller.embedded_mode) ELMO.app.set_title(`${I18n.t('activerecord.models.report/report.one')}: ${this.report.attribs.name}`);
   };
 
+  // Because of AJAX query to load report data
+  // When you click diff page, query gets aborted, shows up as error
+  // Same would probably happen on full reports page too
   klass.prototype.show_error = function (msg) {
     ELMO.app.show_alert({ tag: 'report', type: 'error', msg });
   };

@@ -106,6 +106,7 @@
     }
   };
 
+  // JQXHR, figure out whether actual server error (can you tell if it's just from user navigation?)
   klass.prototype.run_error = function (jqxhr, status, error) {
     this.restore_view();
     // show error
