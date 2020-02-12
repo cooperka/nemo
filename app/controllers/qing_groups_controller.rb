@@ -39,8 +39,13 @@ class QingGroupsController < ApplicationController
     # Adding group requires same permissions as removing questions.
     authorize!(:add_questions, @qing_group.form)
     @qing_group.parent = @qing_group.form.root_group
-    @qing_group.save!
-    render(partial: "group", locals: {qing_group: @qing_group.decorate})
+    if @qing_group.save
+      render(partial: "group", locals: {qing_group: @qing_group.decorate})
+    else
+      # flash[:error] = @qing_group.errors.full_messages.join(", ")
+      # TODO: Return a smaller partial, re-render via JS.
+      render(partial: "modal")
+    end
   end
 
   def show
@@ -49,8 +54,12 @@ class QingGroupsController < ApplicationController
   end
 
   def update
-    @qing_group.update!(qing_group_params)
-    render(partial: "group_inner", locals: {qing_group: @qing_group.decorate})
+    if @qing_group.update(qing_group_params)
+      render(partial: "group_inner", locals: {qing_group: @qing_group.decorate})
+    else
+      # flash[:error] = @qing_group.errors.full_messages.join(", ")
+      render(partial: "modal")
+    end
   end
 
   def destroy

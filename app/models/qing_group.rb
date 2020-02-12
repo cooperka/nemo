@@ -55,6 +55,8 @@ class QingGroup < FormItem
 
   delegate :standard_copy?, :published?, to: :form
 
+  validate :validate_group_name
+
   alias c sorted_children
 
   def code
@@ -93,5 +95,12 @@ class QingGroup < FormItem
     super
     self.group_item_name_translations = {} unless repeatable?
     true
+  end
+
+  private
+
+  # TODO: Put this in schema?
+  def validate_group_name
+    errors.add(:group_name, :required) if group_name.blank?
   end
 end

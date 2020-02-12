@@ -55,6 +55,7 @@ ELMO.Views.GroupModalView = class GroupModalView extends ELMO.Views.FormView {
   }
 
   show() {
+    console.log('@@@ show');
     return this.$el.modal('show');
   }
 
@@ -64,6 +65,7 @@ ELMO.Views.GroupModalView = class GroupModalView extends ELMO.Views.FormView {
   }
 
   hide() {
+    console.log('@@@ hide');
     return this.$el.modal('hide');
   }
 
@@ -78,6 +80,11 @@ ELMO.Views.GroupModalView = class GroupModalView extends ELMO.Views.FormView {
         this.list_view.add_new_group(data);
         return ELMO.app.loading(false);
       },
+      error: (data) => {
+        // TODO: Will be a re-rendered form
+        // this.$() to replace contents
+        this.show();
+      },
     });
   }
 
@@ -91,6 +98,9 @@ ELMO.Views.GroupModalView = class GroupModalView extends ELMO.Views.FormView {
       success: (data) => {
         this.list_view.update_group_on_edit(data);
         return ELMO.app.loading(false);
+      },
+      error: (data) => {
+        this.show();
       },
     });
   }
