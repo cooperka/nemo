@@ -80,6 +80,9 @@ module Results
         # We do this with loops instead of regexps b/c regexps are slow.
         convert_unix_line_endings_to_windows(str)
         convert_mac_line_endings_to_windows(str)
+
+        # TODO: Shorten here.
+        # Delayed::Worker.logger.info(str)
       end
 
       def convert_unix_line_endings_to_windows(str)

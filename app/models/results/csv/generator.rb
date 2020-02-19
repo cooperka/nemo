@@ -6,7 +6,9 @@ module Results
     class Generator
       attr_accessor :buffer, :answer_processor, :header_map, :response_scope
 
-      def initialize(response_scope)
+      def initialize(response_scope, long_text_behavior: "include")
+        Delayed::Worker.logger.info("@@@")
+        Delayed::Worker.logger.info(long_text_behavior)
         self.response_scope = response_scope
         self.header_map = HeaderMap.new
         self.buffer = Buffer.new(header_map: header_map)
