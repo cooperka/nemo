@@ -21,9 +21,9 @@ module Results
       object["ResponseReviewed"] = response.reviewed?
       root = response.root_node_including_tree(:choices, form_item: :question, option_node: :option_set)
       hash = {}
+      # TODO: hash = response_answers()
       save_response_answers(root, hash) unless root.nil?
-      add_form_answers(response.form, object, hash)
-      object
+      object.merge(form_answers(response.form, hash))
     end
 
     private
@@ -48,12 +48,55 @@ module Results
     # Any answer can theoretically have been repeatable in the past.
     # For each Qing ID, save an array of answers for this Response.
     def append_answer(hash, id, answer)
+      # TODO: What if no answers submitted? Make sure all access is moderated.
+      # TODO: Nest/group within key of parent repeat code
       (hash[id] ||= []) << answer
     end
 
     # Make sure we include everything that was specified by our metadata,
     # even if an older Response didn't include a newer qing/group originally
     # (Power BI will fail if any keys are missing).
+    def form_answers(node, hash)
+      parts = node.children.map do |child|
+        if child.is_a?(QingGroup)
+          puts "QingGroup, key: #{node_key(child)}"
+          value = if child.repeatable?
+                    # TODO: This previously recursed as an [array],
+                    #   but maybe it needs to be treated differently.
+                    # [form_answers(child, hash, repeats: true)]
+                    repeat_answers(child, hash)
+                  else
+                    form_answers(child, hash)
+                  end
+          {"#{node_key(child)}": value}
+        # elsif repeats
+        #   puts "Repeats, key: #{node_key(child)}"
+        #   {"#{node_key(child)}": hash[child.id]}
+        else
+          puts "Value, key: #{node_key(child)}"
+          {"#{node_key(child)}": hash[child.id]&.first}
+        end
+      end
+      parts.reduce(&:merge)
+    end
+
+    # TODO: This should return an array
+    def repeat_answers(node, hash)
+      key = node_key(node)
+      parts = node.children.map do |child|
+        # TODO: Handle multiple qings in a single repeat group.
+        puts "Repeats"
+        {
+          "#{repeat_key}": hash[child.id].map do |value|
+            puts "Repeat child, key: #{node_key(child)}"
+            {"#{node_key(child)}": value}
+          end
+        }
+      end
+      parts.reduce(&:merge)
+    end
+
+    # X (OO)
     def add_form_answers(node, object, hash, repeats: false)
       node.children.each do |child|
         if child.is_a?(QingGroup)
@@ -69,6 +112,7 @@ module Results
       end
     end
 
+    # X (OO)
     def add_group_answers(group, object, hash)
       if group.repeatable?
         item = object[node_key(group)] = []
