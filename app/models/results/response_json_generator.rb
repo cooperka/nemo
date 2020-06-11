@@ -20,8 +20,9 @@ module Results
       object["ResponseSubmitDate"] = response.created_at.iso8601
       object["ResponseReviewed"] = response.reviewed?
       root = response.root_node_including_tree(:choices, form_item: :question, option_node: :option_set)
-      add_answers(root, object) unless root.nil?
-      add_nil_answers(response.form, object)
+      hash = {}
+      save_response_answers(root, hash) unless root.nil?
+      add_form_answers(response.form, object, hash)
       object
     end
 
@@ -29,54 +30,52 @@ module Results
 
     delegate :form, :user, to: :response
 
-    # Adds data for the given node to the given object. Object may be an array or hash.
-    def add_answers(node, object)
+    # Saves data for the given Response node to a flat hash for later lookup.
+    def save_response_answers(node, hash)
       node.children.each do |child_node|
         if child_node.is_a?(Answer)
-          object[child_node.question_code] = value_for(child_node)
+          append_answer(hash, child_node.questioning_id, value_for(child_node))
         elsif child_node.is_a?(AnswerSet)
-          object[child_node.question_code] = answer_set_value(child_node)
+          append_answer(hash, child_node.questioning_id, answer_set_value(child_node))
         elsif child_node.is_a?(AnswerGroup)
-          add_group_answers(child_node, object)
+          save_response_answers(child_node, hash)
         elsif child_node.is_a?(AnswerGroupSet)
-          set = object[node_key(child_node)] = []
-          add_answers(child_node, set)
+          save_response_answers(child_node, hash)
         end
       end
     end
 
-    def add_group_answers(group, object)
-      if group.repeatable?
-        object << (item = {})
-        add_answers(group, item)
-      else
-        subgroup = object[node_key(group)] = {}
-        add_answers(group, subgroup)
-      end
+    # Any answer can theoretically have been repeatable in the past.
+    # For each Qing ID, save an array of answers for this Response.
+    def append_answer(hash, id, answer)
+      (hash[id] ||= []) << answer
     end
 
-    # Make sure we include everything specified by metadata in our output,
-    # even if an older Response didn't include that qing/group originally.
-    def add_nil_answers(node, object)
-      # Note: This logic is similar to add_answers, but with Form instead of Response.
-      # The logic seems more readable when they're independent like this.
-      # It also preserves old data better.
-      node.children.map do |child|
+    # Make sure we include everything that was specified by our metadata,
+    # even if an older Response didn't include a newer qing/group originally
+    # (Power BI will fail if any keys are missing).
+    def add_form_answers(node, object, hash, repeats: false)
+      node.children.each do |child|
         if child.is_a?(QingGroup)
-          add_nil_group_answers(child, object)
+          add_group_answers(child, object, hash)
+        elsif repeats
+          # TODO: Handle multiple qings in a single repeat group.
+          hash[child.id].each do |value|
+            object << {"#{node_key(child)}": value}
+          end
         else
-          object[node_key(child)] ||= nil
+          object[node_key(child)] = hash[child.id]&.first
         end
       end
     end
 
-    def add_nil_group_answers(group, object)
+    def add_group_answers(group, object, hash)
       if group.repeatable?
-        entries = object[node_key(group)] ||= []
-        entries.each { |entry| add_nil_answers(group, entry) }
+        item = object[node_key(group)] = []
+        add_form_answers(group, item, hash, repeats: true)
       else
-        subgroup = object[node_key(group)] ||= {}
-        add_nil_answers(group, subgroup)
+        item = object[node_key(group)] = {}
+        add_form_answers(group, item, hash)
       end
     end
 
