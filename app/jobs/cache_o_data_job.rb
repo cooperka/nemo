@@ -23,6 +23,7 @@ class CacheODataJob < ApplicationJob
     response.update_without_validate!(cached_json: json, dirty_json: false)
     json
   rescue StandardError => e
+    # TODO: mark clean (will attempt to re-cache at request time)
     # Phone home without failing the entire operation.
     logger.debug(debug_msg(e, response))
     ExceptionNotifier.notify_exception(e, data: {shortcode: response.shortcode})
