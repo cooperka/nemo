@@ -117,7 +117,7 @@ gem "faker", "~> 1.6"
 gem "ruby-jmeter", "~> 2.13.4"
 
 group :development do
-  gem "binding_of_caller", "~> 0.7.2"
+  gem "binding_of_caller", "~> 0.8.0"
   gem "fix-db-schema-conflicts", "~> 3.0"
   gem "letter_opener", "~> 1.4.1"
   gem "rails-erd", "~> 1.4.0"
@@ -157,6 +157,7 @@ group :development, :test do
   gem "webdrivers", "~> 4.0"
 
   # Debugging
+  gem "better_errors", "~> 2.8"
   gem "pry", "~> 0.13"
   gem "pry-byebug", "~> 3.9"
   gem "pry-rails", "~> 0.3"

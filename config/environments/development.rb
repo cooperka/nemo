@@ -48,6 +48,18 @@ ELMO::Application.configure do
 
   config.action_view.logger = nil
 
+  # For puma-dev domains.
+  # BetterErrors::Middleware.allow_ip!("0.0.0.0/0")
+  # BetterErrors.use_pry!
+
+  # e.g. in config/initializers/better_errors.rb
+  # This will stop BetterErrors from trying to render larger objects, which can cause
+  # slow loading times and browser performance problems. Stated size is in characters and refers
+  # to the length of #inspect's payload for the given object. Please be aware that HTML escaping
+  # modifies the size of this payload so setting this limit too precisely is not recommended.
+  # default value: 100_000
+  # BetterErrors.maximum_variable_inspect_size = 5_000_000
+
   config.to_prepare do
     # # [Performance] Uncomment to profile specific methods.
     # Rack::MiniProfiler.profile_method(User, :foo) { "executing foo" }

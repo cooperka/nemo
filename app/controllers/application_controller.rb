@@ -19,7 +19,7 @@ class ApplicationController < ActionController::Base
   # Makes sure authorization is performed in each controller. (CanCan method)
   check_authorization
 
-  protect_from_forgery with: :exception, unless: -> { request.format.json? || request.format.xml? }
+  # protect_from_forgery with: :exception, unless: -> { request.format.json? || request.format.xml? }
 
   rescue_from CanCan::AccessDenied, with: :handle_access_denied
   rescue_from RecentLoginRequiredError, with: :handle_recent_login_required
