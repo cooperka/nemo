@@ -12,7 +12,7 @@ module Searchable
 
     # In the simple case, give it a basic serializer that knows about search queries.
     # This can be replaced in the controller if needed.
-    @searcher_serializer = SearcherSerializer.new(searcher)
+    @searcher_serializer = SearcherSerializer.render_as_json(searcher)
 
     searcher
   end

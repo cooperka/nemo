@@ -40,7 +40,7 @@ class ResponsesController < ApplicationController
 
         searcher = build_searcher(@responses)
         @responses = apply_searcher_safely(searcher)
-        @searcher_serializer = ResponsesSearcherSerializer.new(searcher)
+        @searcher_serializer = ResponsesSearcherSerializer.render_as_json(searcher)
 
         @selected_ids = params[:sel]
         @selected_all_pages = params[:select_all_pages]
