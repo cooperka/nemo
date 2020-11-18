@@ -1,22 +1,26 @@
 # frozen_string_literal: true
 
 class API::V1::AnswerSerializer < ActiveModel::Serializer
-  attributes :id, :code, :question, :value
-  format_keys :underscore
+  fields :id
 
-  def filter(keys)
-    keys - (scope.params[:controller] == "api/v1/answers" ? %i[code question] : [])
-  end
+  # transform UnderscoreTransformer
 
-  def code
+  # TODO: if scope.params[:controller] == "api/v1/answers" render(x, view: :api)
+  # def filter(keys)
+  #   keys - (scope.params[:controller] == "api/v1/answers" ? %i[code question] : [])
+  # end
+
+  field :code do |object|
     object.question.code
   end
 
-  def question
+  field :question do |object|
     object.question.name
   end
 
-  def value
-    object.casted_value
+  field :casted_value, name: :value
+
+  view :api do
+    exclude :code, :question
   end
 end

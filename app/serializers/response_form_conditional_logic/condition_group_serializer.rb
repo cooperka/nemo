@@ -3,19 +3,20 @@
 module ResponseFormConditionalLogic
   # Serializes condition group for response web form display logic
   class ConditionGroupSerializer < ApplicationSerializer
-    attributes :members, :true_if, :negate, :type, :name
+    fields :true_if, :negate, :name
 
-    def members
+    field :members do |object|
       object.members.map do |m|
+        # TODO Can we improve?
         if m.is_a?(Forms::ConditionGroup)
-          ConditionGroupSerializer.new(m)
+          ConditionGroupSerializer.render_as_hash(m)
         else
-          ConditionSerializer.new(m)
+          ConditionSerializer.render_as_hash(m)
         end
       end
     end
 
-    def type
+    field :type do |object|
       object.model_name.name.demodulize
     end
   end

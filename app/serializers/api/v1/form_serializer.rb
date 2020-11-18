@@ -1,15 +1,19 @@
 # frozen_string_literal: true
 
 class API::V1::FormSerializer < ActiveModel::Serializer
-  attributes :id, :name, :responses_count, :questions
-  format_keys :underscore
+  fields :id, :name, :responses_count
 
-  def filter(keys)
-    # Only show questions if show action.
-    keys - (scope.params[:action] == "show" ? [] : [:questions])
-  end
+  # transform UnderscoreTransformer
 
-  def questions
-    object.api_visible_questions.as_json(only: %i[id code], methods: :name)
+  # TODO: if scope.params[:action] == "show" (view: :show)
+  # def filter(keys)
+  #   # Only show questions if show action.
+  #   keys - (scope.params[:action] == "show" ? [] : [:questions])
+  # end
+
+  view :show do
+    field :questions do |object|
+      object.api_visible_questions.as_json(only: %i[id code], methods: :name)
+    end
   end
 end
