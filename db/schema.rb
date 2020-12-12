@@ -254,10 +254,10 @@ ActiveRecord::Schema.define(version: 2020_12_09_194945) do
   create_table "media_objects", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "answer_id"
     t.datetime "created_at", null: false
-    t.string "item_content_type", limit: 255, null: false
-    t.string "item_file_name", limit: 255, null: false
-    t.integer "item_file_size", null: false
-    t.datetime "item_updated_at", null: false
+    t.string "item_content_type", limit: 255
+    t.string "item_file_name", limit: 255
+    t.integer "item_file_size"
+    t.datetime "item_updated_at"
     t.string "type", limit: 255, null: false
     t.datetime "updated_at", null: false
     t.index ["answer_id"], name: "index_media_objects_on_answer_id"
@@ -475,10 +475,10 @@ ActiveRecord::Schema.define(version: 2020_12_09_194945) do
 
   create_table "saved_uploads", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "file_content_type", null: false
-    t.string "file_file_name", null: false
-    t.integer "file_file_size", null: false
-    t.datetime "file_updated_at", null: false
+    t.string "file_content_type"
+    t.string "file_file_name"
+    t.integer "file_file_size"
+    t.datetime "file_updated_at"
     t.datetime "updated_at", null: false
   end
 
