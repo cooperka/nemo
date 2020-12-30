@@ -31,16 +31,21 @@ class ConvertToActiveStorage < ActiveRecord::Migration[6.0]
 
         next if attachment_keys.blank?
 
-        puts "Converting #{model.all.count} #{model.name} attachments..."
+        total = model.all.count
+        puts "Converting #{total} #{model.name.pluralize}..."
 
-        model.find_each.each do |instance|
+        # TODO: Make this work because it's super slow when running sync.
+        #   PG::InvalidSqlStatementName: ERROR:  prepared statement "active_storage_blob_statement" does not exist
+        # num_procs = ENV["NUM_PROCS"] ? ENV["NUM_PROCS"].to_i : Etc.nprocessors
+        # Parallel.each_with_index(model.find_each.each, in_processes: num_procs) do |instance, index|
+        model.find_each.each_with_index do |instance, index|
           attachment_keys.each do |attachment_key|
             if instance.send(attachment_key)&.path.blank?
-              puts "Skipping blank #{attachment_key} for #{model.name} #{instance.id}"
+              puts "Skipping blank #{attachment_key} for #{model.name} #{instance.id}" if ENV["DEBUG"]
               next
             end
 
-            puts "Converting #{attachment_key} for #{model.name} #{instance.id}"
+            puts "Converting #{model.name} #{attachment_key} #{instance.id} (#{index} / #{total})"
 
             ActiveRecord::Base.connection.raw_connection.exec_prepared(
               "active_storage_blob_statement", [
