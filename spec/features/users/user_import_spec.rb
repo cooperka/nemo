@@ -12,6 +12,8 @@ feature "user import", js: true do
     login(admin)
   end
 
+  # TODO: private method `gets' called for #<Paperclip::Attachment:0x00007fbe22ac0200>
+  #   when trying to CSV.new(file).read
   scenario "happy path" do
     visit("/en/m/#{mission.compact_name}/user-imports/new")
     try_invalid_uploads_and_then(user_import_fixture("varying_info.csv").path)

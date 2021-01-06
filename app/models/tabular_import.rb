@@ -35,10 +35,7 @@ class TabularImport
   protected
 
   def open_sheet
-    self.sheet = Roo::Spreadsheet.open(file).sheet(0)
-  rescue TypeError, ArgumentError => e
-    raise e unless /not an Excel 2007 file|Can't detect the type/.match?(e.to_s)
-    add_run_error(:wrong_type)
+    self.sheet = CSV.new(file).read
   end
 
   def add_run_error(message, opts = {})
