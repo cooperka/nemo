@@ -84,6 +84,12 @@ class ConvertToActiveStorage < ActiveRecord::Migration[6.0]
     # instance.send("#{attachment}_file_name")
   end
 
+  # Cache something here that's slow?
+  # Test with local data to make sure it's fast in that case.
+  # Run diagnostics on how many attachments there are
+  # CEJP: 400. GW: 275k, 8 GB. Health: 20k. Staging: 1100.
+  # Responses + operations + ODK XML
+  # Easily fits on disk, can we clone locally first? (just GW/Health)
   def checksum(attachment)
     if Rails.configuration.active_storage.service == :local
       url = attachment.path

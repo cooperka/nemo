@@ -59,6 +59,7 @@ module ODK
     end
 
     def file_contents
+      # TODO: Work with cloud storage?
       File.exist?(priv_path) ? File.read(priv_path) : nil
     end
 

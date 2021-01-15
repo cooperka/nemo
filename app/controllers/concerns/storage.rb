@@ -5,6 +5,7 @@
 module Storage
   extend ActiveSupport::Concern
 
+  # TODO remove, only used 2 places that are also being removed
   def send_attachment(attachment, params = {})
     local = Rails.configuration.active_storage.service == :local
     style = params.delete(:style)
@@ -25,6 +26,15 @@ module Storage
     default_params = {filename: attachment.filename.to_s,
                       content_type: attachment.content_type,
                       disposition: "attachment"}
+    # TODO: Verify this actually streams, not delays.
+    #   From Tom:
+    #
+    # # Stream from controller to download
+    # response.headers["Content-Type"] = @model.image.content_type
+    # response.headers["Content-Disposition"] = "attachment; #{@model.image.filename.parameters}"
+    # @model.image.download do |chunk|
+    #   response.stream.write(chunk)
+    # end
     send_data(attachment.download, default_params.merge(params))
   end
 end

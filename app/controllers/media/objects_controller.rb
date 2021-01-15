@@ -17,6 +17,8 @@ module Media
       end
     end
 
+    # Remove
+    # In the page, <a href=some_url> rails_rep_url(media_object)
     def show
       style = params[:style] || "original"
       @answer = @media_object.answer

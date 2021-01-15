@@ -48,6 +48,7 @@
 # rubocop:enable Layout/LineLength
 
 FactoryBot.define do
+  # TODO: After build attach? Where is that happening currently?
   factory :question do
     transient do
       use_geo_option_set { false }
