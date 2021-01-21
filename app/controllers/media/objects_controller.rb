@@ -17,8 +17,14 @@ module Media
       end
     end
 
-    # Remove
-    # In the page, <a href=some_url> rails_rep_url(media_object)
+    # - Replace objects_controller#show with direct attachment logic in answers_helper
+    # - Set @media_object.item's filename in the db? or somehow dynamically? (See objects_controller#media_filename)
+    # - answers_helper#thumb_path needs some sort of refactor?
+    # - file_upload_spec "uploading files" should pass now
+
+    # TODO: Remove? OR Simply send_attachment?
+    # Normally in the page, <a href=some_url> rails_rep_url(media_object)...
+    # read docs again, am I missing some simplicity?
     def show
       style = params[:style] || "original"
       @answer = @media_object.answer
@@ -27,8 +33,42 @@ module Media
 
       authorize!(:show, @response) if @response
 
-      send_attachment(@media_object.item,
-        style: style, disposition: disposition, filename: media_filename)
+      # send_attachment(@media_object.item,
+      #   style: style, disposition: disposition, filename: media_filename)
+
+      attachment = @media_object.item
+      params = {style: style, disposition: disposition, filename: media_filename}
+
+      local = Rails.configuration.active_storage.service == :local
+      style = params.delete(:style)
+
+      if params[:disposition] == "inline"
+        # 100px container, doubled to 200 to support retina screens.
+        attachment = attachment.variant(resize_to_limit: [200, 200]).processed if style == "thumb"
+
+        # What a mess, there must be a better way to handle local/cloud original/variant...
+        url = if local
+                attachment.respond_to?(:variation) ? rails_representation_url(attachment) : rails_blob_path(attachment)
+              else
+                attachment.service_url
+              end
+        return redirect_to(url)
+      end
+
+      default_params = {filename: attachment.filename.to_s,
+                        content_type: attachment.content_type,
+                        disposition: "attachment"}
+
+      # TODO: Verify this actually streams, not delays.
+      #   From Tom:
+      #
+      # # Stream from controller to download
+      # response.headers["Content-Type"] = @model.image.content_type
+      # response.headers["Content-Disposition"] = "attachment; #{@model.image.filename.parameters}"
+      # @model.image.download do |chunk|
+      #   response.stream.write(chunk)
+      # end
+      send_data(attachment.download, default_params.merge(params))
     end
 
     def create
@@ -65,6 +105,7 @@ module Media
       params.require(:media_object).permit(:answer_id, :annotation)
     end
 
+    # TODO: Use this somehow? Or remove, was only used by #show
     def media_filename
       extension = File.extname(@media_object.item.filename.to_s)
       if @response && @answer

@@ -191,6 +191,7 @@ class Ability
     if mission.locked?
       can(%i[index read export], Response, mission_id: mission.id)
     else
+      # TODO? Checked by objects_controller#show
       can(:manage, Response, mission_id: mission.id)
       can(:create, Sms::Test)
     end
